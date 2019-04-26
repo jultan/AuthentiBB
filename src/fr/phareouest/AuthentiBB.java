@@ -20,7 +20,7 @@ public class AuthentiBB extends UiApplication {
     }
 
     /**
-     * Creates a new TestTOTP object
+     * Creates a new AuthentiBB object
      */
     public AuthentiBB() {
         // Push a screen onto the UI stack for rendering.

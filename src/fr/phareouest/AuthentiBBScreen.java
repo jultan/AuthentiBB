@@ -38,16 +38,9 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
     private BasicEditField ligne1;
     private ButtonField bouton1; 
     
-    private PersistentObject persistentObject;
-    static final long KEY = 0x9df9f961bc7d6baL;
-    
-
-
-
     public AuthentiBBScreen() {
         super( MainScreen.VERTICAL_SCROLL | MainScreen.VERTICAL_SCROLLBAR );
-        setTitle( "PhareOuest Security Token" );
-        persistentObject = PersistentStore.getPersistentObject(KEY);
+        setTitle( "BlackBerry Authenticator" );
         //messageFin = new LabelField("test");
         //add(messageFin);
       
@@ -87,9 +80,6 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
         OtpUpdater thread = new OtpUpdater(this);
         thread.start();
         add(new SeparatorField());
-
-        
-
     }
     
     
@@ -125,5 +115,8 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
         }
       }
 
-
+    public boolean onClose()
+   {
+         return true;
+   }
 }
