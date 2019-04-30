@@ -95,7 +95,7 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
     public void fieldChanged(Field field, int context) {
     	if (field == bouton1) {
     	//Dialog.inform("Clear Button Pressed!");
-    	EditionScreen EditionScreen = new EditionScreen();
+    	EditionScreen EditionScreen = new EditionScreen("alpha");
     	UiApplication.getUiApplication().pushScreen(EditionScreen);
     	}
     	}
