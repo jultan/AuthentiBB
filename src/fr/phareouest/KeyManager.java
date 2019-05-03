@@ -8,6 +8,7 @@ import net.rim.device.api.system.PersistentStore;
 class KeyManager {
 	private PersistentObject persistentObject;
 	private Hashtable keyHash;
+	
 		
 	public KeyManager(){
 		persistentObject= PersistentStore.getPersistentObject(0x9787015f06321e7cL);
@@ -26,9 +27,17 @@ class KeyManager {
 		return keyHash.get(key);
 	}
 	
+	public int size() {
+		return keyHash.size();
+	}
+	
 	public void set(String key, Object value){
 		keyHash.put(key, value);
 	}
+	
+//	public enum list(){
+//		return keyHash.keys();
+//	}
 	
 	public void commit(){
 		persistentObject.commit();

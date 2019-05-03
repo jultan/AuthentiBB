@@ -21,11 +21,43 @@ public class EditionScreen extends MainScreen implements FieldChangeListener {
     private BasicEditField inputKey = new BasicEditField(TextField.NO_NEWLINE);
     private BasicEditField inputName = new BasicEditField(TextField.NO_NEWLINE);
 	private Border myBorder = BorderFactory.createBitmapBorder(new XYEdges(20, 16, 27, 23),Bitmap.getBitmapResource("img/corners.png"));
+
+	
+    public EditionScreen() {
+        super( MainScreen.VERTICAL_SCROLL | MainScreen.VERTICAL_SCROLLBAR );
+        //setTitle("Edition de la Clé");
+      
+        LabelField labName = new LabelField("Nom du Service :");
+        labName.setPadding(10,10,10,10);
+        add(labName);
+        
+        inputName.setBorder(myBorder);
+        add(inputName);
+
+        LabelField labKey = new LabelField("Valeur de la Clé :");
+        labKey.setPadding(10,10,10,10);
+        add(labKey);
+        
+        inputKey.setBorder(myBorder);
+        add(inputKey);
+        
+        GridFieldManager EndLine = new GridFieldManager(1,3,Field.FIELD_VCENTER);
+	        EndLine.setColumnPadding(50);
+	        boutValider = new ButtonField("Valider", ButtonField.CONSUME_CLICK);
+	        boutValider.setChangeListener(this);
+	        EndLine.add(boutValider);
+	        EndLine.add(new LabelField("bouya"));
+	        boutAnnuler = new ButtonField("Annuler", ButtonField.CONSUME_CLICK|Field.FIELD_RIGHT);
+	        boutAnnuler.setChangeListener(this);
+        EndLine.add(boutAnnuler);
+        add(EndLine);
+
+    }	
 	
 
     public EditionScreen(String nameValue) {
         super( MainScreen.VERTICAL_SCROLL | MainScreen.VERTICAL_SCROLLBAR );
-        setTitle("Edition de la Clé");
+        //setTitle("Edition de la Clé");
       
         LabelField labName = new LabelField("Nom du Service :");
         labName.setPadding(10,10,10,10);
