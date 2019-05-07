@@ -8,6 +8,7 @@ import net.rim.device.api.system.PersistentStore;
 class KeyManager {
 	private PersistentObject persistentObject;
 	private Hashtable keyHash;
+	//private enum truc;
 	
 		
 	public KeyManager(){
@@ -35,9 +36,9 @@ class KeyManager {
 		keyHash.put(key, value);
 	}
 	
-//	public enum list(){
-//		return keyHash.keys();
-//	}
+	public Object keys(){
+		return keyHash.keys();
+	}
 	
 	public void commit(){
 		persistentObject.commit();

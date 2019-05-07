@@ -1,5 +1,8 @@
 package fr.phareouest;
 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.macs.HMac;
@@ -11,6 +14,7 @@ import fr.phareouest.util.PasscodeGenerator;
 import fr.phareouest.util.Base32String.DecodingException;
 
 
+import net.rim.device.api.collection.Collection;
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.Field;
@@ -32,6 +36,8 @@ import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.component.TextSpinBoxField;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.util.StringProvider;
+import net.rim.device.api.system.PersistentObject;
+import net.rim.device.api.system.PersistentStore;
 
 public class AuthentiBBScreen extends MainScreen implements FieldChangeListener {
 
@@ -42,12 +48,20 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 	private LabelField messageFin;
 	private BasicEditField ligne1;
 	private ButtonField bouton1; 
+	private ButtonField bouton; 
 	private ObjectChoiceField spinBoxServices;
+	private KeyManager keymanager = new KeyManager();
+	private PersistentObject persistentObject;
+	private Hashtable keyHash;
 	private final String[] SERVICES   = 
 		{"Google","Gitlab","Microsoft","Steam","Artful","Conserto","Facebook"};
+	
+
 
 	public AuthentiBBScreen() {
 		super( MainScreen.VERTICAL_SCROLL | MainScreen.VERTICAL_SCROLLBAR );
+		persistentObject= PersistentStore.getPersistentObject(0x9787015f06321e7cL);
+		keyHash = (Hashtable)persistentObject.getContents();
 		//setTitle( "BlackBerry Authenticator" );
 		//messageFin = new LabelField("test");
 		//add(messageFin);
@@ -80,15 +94,31 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 		ligne1 = new BasicEditField("","contenu");
 		add(ligne1);
 
-		bouton1 = new ButtonField("Google", ButtonField.CONSUME_CLICK);
-		bouton1.setChangeListener(this);
-		add(bouton1);
+//		bouton1 = new ButtonField("Google", ButtonField.CONSUME_CLICK);
+//		bouton1.setChangeListener(this);
+//		add(bouton1);
 
 
 		OtpUpdater thread = new OtpUpdater(this);
 		thread.start();
 		add(new SeparatorField());
-
+		
+		Enumeration enumeration = keyHash.keys();
+		
+		while(enumeration.hasMoreElements()){
+			String key = (String)enumeration.nextElement();
+			ButtonField bouton = new ButtonField(key, ButtonField.CONSUME_CLICK);
+			bouton.setChangeListener(this);
+			add(bouton);
+		}
+		
+//		keyHash.keys().values();
+//		keyHash.size();
+//		
+//	
+//	
+//		bouya[] = list(enumeration);
+		
 		spinBoxServices   = new ObjectChoiceField("",SERVICES,1,Field.FIELD_HCENTER);
 		add(spinBoxServices);
 
@@ -106,11 +136,16 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 	}
 
 	public void fieldChanged(Field field, int context) {
-		if (field == bouton1) {
-			//Dialog.inform("Clear Button Pressed!");
-			EditionScreen EditionScreen = new EditionScreen("alpha");
+		if (field instanceof ButtonField) {
+			//Dialog.inform(((ButtonField) field).getLabel());
+			EditionScreen EditionScreen = new EditionScreen(((ButtonField) field).getLabel());
 			UiApplication.getUiApplication().pushScreen(EditionScreen);
 		}
+//		if (field == bouton) {
+//			Dialog.inform("Button Pressed!");
+//			//EditionScreen EditionScreen = new EditionScreen("alpha");
+//			//UiApplication.getUiApplication().pushScreen(EditionScreen);
+//		}
 	}
 
 	public static String computePin(String secret) {
