@@ -105,21 +105,28 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 		
 		Enumeration enumeration = keyHash.keys();
 		
+		
+		
+		String[] tableValeurs = new String[keyHash.size()];
+		int tabind = 0;
+		
 		while(enumeration.hasMoreElements()){
 			String key = (String)enumeration.nextElement();
 			ButtonField bouton = new ButtonField(key, ButtonField.CONSUME_CLICK);
 			bouton.setChangeListener(this);
+			tableValeurs[tabind] = key;
 			add(bouton);
+			tabind = tabind + 1;
 		}
+
+		
+		
 		
 //		keyHash.keys().values();
 //		keyHash.size();
-//		
-//	
-//	
 //		bouya[] = list(enumeration);
 		
-		spinBoxServices   = new ObjectChoiceField("",SERVICES,1,Field.FIELD_HCENTER);
+		spinBoxServices   = new ObjectChoiceField("",tableValeurs,1,Field.FIELD_HCENTER);
 		add(spinBoxServices);
 
 
