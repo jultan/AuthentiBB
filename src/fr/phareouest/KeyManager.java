@@ -1,15 +1,16 @@
 package fr.phareouest;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
+import net.rim.device.api.ui.component.ButtonField;
 
 
 class KeyManager {
 	private PersistentObject persistentObject;
 	private Hashtable keyHash;
-	//private enum truc;
-	
+
 		
 	public KeyManager(){
 		persistentObject= PersistentStore.getPersistentObject(0x9787015f06321e7cL);
@@ -28,6 +29,17 @@ class KeyManager {
 		return keyHash.get(key);
 	}
 	
+	public Object remove(String key) {
+		return keyHash.remove(key);
+	}
+	
+	public String firstKey() {
+		Enumeration en = keyHash.keys();
+		String key = en.nextElement().toString();
+		return key;
+	}
+	
+	
 	public int size() {
 		return keyHash.size();
 	}
@@ -36,7 +48,7 @@ class KeyManager {
 		keyHash.put(key, value);
 	}
 	
-	public Object keys(){
+	public Enumeration keys(){
 		return keyHash.keys();
 	}
 	
