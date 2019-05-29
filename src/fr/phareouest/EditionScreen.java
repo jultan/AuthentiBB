@@ -146,6 +146,9 @@ public class EditionScreen extends MainScreen implements FieldChangeListener {
 					keymanager.remove(inputName.getText().trim());
 					//EditionScreen EditionScreen = new EditionScreen(myCurrentKey);
 					//UiApplication.getUiApplication().pushScreen(EditionScreen);
+			    	myCurrentKey = keymanager.firstKey();
+			    	//effacer le bouton
+			    	getScreenBelow().doPaint();
 					getScreen().close();
 				}
 			});
@@ -156,13 +159,18 @@ public class EditionScreen extends MainScreen implements FieldChangeListener {
     	if (field == boutValider) {
 	    	keymanager.set(inputName.getText().trim(),inputKey.getText().trim());
 	    	keymanager.commit();
-	    	UiApplication.getUiApplication().updateDisplay();
-	    	//this.
 	    	getScreen().close();
+			UiApplication.getUiApplication().invokeLater(new Runnable(){
+				public void run(){
+					AuthentiBBScreen screen = (AuthentiBBScreen)UiApplication.getUiApplication().getActiveScreen();
+					screen.genButtons(); 
+				}
+	});
 	    	
     	}
     	if (field == boutAnnuler) {
     		getScreen().close();	
+    		
     	}
     	}
     

@@ -8,11 +8,16 @@ import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 
+import com.google.zxing.oned.OneDReader;
+
 import fr.phareouest.util.Base32String;
 import fr.phareouest.util.OtpUpdater;
 import fr.phareouest.util.PasscodeGenerator;
 import fr.phareouest.util.Base32String.DecodingException;
 
+import net.rim.device.api.command.Command;
+import net.rim.device.api.command.CommandHandler;
+import net.rim.device.api.command.ReadOnlyCommandMetadata;
 import net.rim.device.api.system.PersistentObject;
 import net.rim.device.api.system.PersistentStore;
 import net.rim.device.api.ui.Field;
@@ -41,28 +46,28 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 	private String myCurrentKey;
 	private String myCurrentValue;
 	private GaugeField barreDeProgression;
-//	private PersistentObject persistentObject;
-//	private Hashtable keyHash;
 	private StandardTitleBar authBBTitleBar;
 	private KeyManager keymanager = new KeyManager();
-	private FlowFieldManager ThirdRow = new FlowFieldManager();
-
-
+	private LabelField troubleshoot;
+	private FlowFieldManager ThirdRow;
+	private FlowFieldManager SecondRow;
+	private FlowFieldManager FirstRow;
+	private SwitchCommandHandler switchHandler;
+	private MenuItem updateKey;
 
 	public AuthentiBBScreen() {
 		
 		super( MainScreen.VERTICAL_SCROLL | MainScreen.VERTICAL_SCROLLBAR );
-		
-		//persistentObject= PersistentStore.getPersistentObject(0x9787015f06321e7cL);
-		//keyHash = (Hashtable)persistentObject.getContents();
 
-		FlowFieldManager FirstRow = new FlowFieldManager();
-		FlowFieldManager SecondRow = new FlowFieldManager();
+		FirstRow = new FlowFieldManager();
+		SecondRow = new FlowFieldManager();
+		ThirdRow = new FlowFieldManager();
 		genButtonsLine(keymanager,ThirdRow); // new FlowFieldManager();
 		
-	
 		myCurrentKey = keymanager.firstKey();
 		myCurrentValue = keymanager.get(myCurrentKey).toString();
+		
+		switchHandler = new SwitchCommandHandler();
 			
 		authBBTitleBar = new StandardTitleBar()
         .addIcon("icon-tfa.png")
@@ -95,18 +100,47 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 
 		barreDeProgression = new GaugeField("",0,30,0,GaugeField.NO_TEXT);
 		SecondRow.add(barreDeProgression);
+		
+		troubleshoot = new LabelField("bouya");
+		ThirdRow.add(troubleshoot);
 
 		add(FirstRow);
 		add(SecondRow);
 		add(ThirdRow);
+		
+		
+//		updateKey = new MenuItem(new StringProvider("Update Key"), 20, 20) {
+//		public void run() {
+//			EditionScreen EditionScreen = new EditionScreen(myCurrentKey,keymanager);
+//			UiApplication.getUiApplication().pushScreen(EditionScreen);
+//
+//		}};
+//		//addMenuItem(updateKey);
 
 		OtpUpdater thread = new OtpUpdater(this);
 		thread.start();
+		
 	}
 
 	
-
-	private void genButtonsLine(KeyManager kmgr, FlowFieldManager ffmgr) {
+//	public boolean onMenu(int instance) {
+//		this.removeAllMenuItems();
+//
+//		updateKey = new MenuItem(new StringProvider("Update Key"), 20, 20) {
+//		public void run() {
+//			EditionScreen EditionScreen = new EditionScreen(myCurrentKey,keymanager);
+//			//UiApplication.getUiApplication().pushScreen(EditionScreen);
+//			Dialog.alert(myCurrentKey);
+//
+//		}};
+//
+//		this.addMenuItem(updateKey);
+//		super.onMenu(instance);
+//		return true;
+//}
+	
+	
+	public void genButtonsLine(KeyManager kmgr, FlowFieldManager ffmgr) {
 		// TODO Auto-generated method stub
 		//FlowFieldManager f = new FlowFieldManager();
 		Enumeration enumeration = kmgr.keys();
@@ -122,27 +156,49 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 			ffmgr.add(bouton);
 		}
 
-		
 	}
+	
+	
+	
+	public void genButtons() {
+		// TODO Auto-generated method stub
+		//FlowFieldManager f = new FlowFieldManager();
+		Enumeration enumeration = keymanager.keys();
+		//String[] tableValeurs = new String[kmgr.size()];
+		if (ThirdRow != null){
+			ThirdRow.deleteAll();
+		}
+		while(enumeration.hasMoreElements()){
+			String key = enumeration.nextElement().toString();
+			ButtonField bouton = new ButtonField(key, ButtonField.CONSUME_CLICK);
+			bouton.setChangeListener(this);
+			//tableValeurs[tabind] = key;
+			ThirdRow.add(bouton);
+		}
 
-
+	}
 
 	public void appendLabelText() {
 		
 		long currentTimeSeconds = System.currentTimeMillis() / 1000;
 		long currentSeconds = currentTimeSeconds % 30;
-
 		myToken.setText(computePin(myCurrentValue));
 		barreDeProgression.setValue((int)currentSeconds);
+		//bug affichage : perte du focus
 		//genButtonsLine(keymanager,ThirdRow);
 
 	}
 	
-	public void onExposed(){
-		genButtonsLine(keymanager,ThirdRow);
+	public void onUiEngineAttached(){
+		//myCurrentKey = keymanager.firstKey();
+//		myCurrentKey = keymanager.firstKey();
+//		myCurrentValue = keymanager.get(myCurrentKey).toString();
+//		genButtonsLine(keymanager,ThirdRow);
+//		authBBTitleBar.addTitle(myCurrentKey);
+//		setTitleBar(authBBTitleBar);
+		Dialog.inform(myCurrentKey);
 	}
 	
-
 	public void fieldChanged(Field field, int context) {
 		if (field instanceof ButtonField) {
 //			EditionScreen EditionScreen = new EditionScreen(((ButtonField) field).getLabel());
@@ -151,6 +207,10 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 			myCurrentValue = keymanager.get(myCurrentKey).toString();
 			myToken.setText(computePin(myCurrentValue));
 			authBBTitleBar.addTitle("authentiBB"+" ["+myCurrentKey+"] ");
+			//switchHandler = new SwitchCommandHandler();
+			troubleshoot.setText(myCurrentKey);
+		
+			
 			
 		}
 //		if (field == bouton) {
@@ -160,6 +220,16 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 //		}
 	}
 
+	
+	 class DialogCommandHandler extends CommandHandler
+	 {
+	     public void execute(ReadOnlyCommandMetadata metadata, Object context)
+	     {
+	         Dialog.alert("Executing command for " + context.toString());
+	     }           
+	 }
+	
+	
 	public static String computePin(String secret) {
 		try {
 			final byte[] keyBytes = Base32String.decode(secret);
@@ -174,24 +244,37 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 			return "Decoding exception";
 		}
 	}
+	
+	private void switchScreen() {
+		
+		EditionScreen EditionScreen = new EditionScreen(myCurrentKey,keymanager);
+		UiApplication.getUiApplication().pushScreen(EditionScreen);
+		
+	}
 
 //	public boolean onClose()
 //	{
 //		return true;
 //	}
-	
-	public void onFocus(){
-		Dialog.alert("Focus");
-	}
+	class SwitchCommandHandler extends CommandHandler {
+		public void execute(ReadOnlyCommandMetadata metaData, Object context) {
+			switchScreen();
+		}
+}
 
 	protected void makeMenu(Menu menu, int instance) {
 		super.makeMenu(menu, instance);
+		
 		menu.add(new MenuItem(new StringProvider("New Key"), 10, 10) {
 			public void run() {
 				EditionScreen EditionScreen = new EditionScreen(keymanager);
 				UiApplication.getUiApplication().pushScreen(EditionScreen);
+				
 			}
 		});
+//		updateKey = new MenuItem(new StringProvider("Update Key"), 20, 20);
+//		updateKey.setCommand(new Command(switchHandler));
+		//menu.add(updateKey);
 		menu.add(new MenuItem(new StringProvider("Update Key"), 20, 20) {
 			public void run() {
 				EditionScreen EditionScreen = new EditionScreen(myCurrentKey,keymanager);
@@ -199,4 +282,8 @@ public class AuthentiBBScreen extends MainScreen implements FieldChangeListener 
 			}
 		});
 	}
+	
+	
+	
+	
 }
